@@ -1,10 +1,67 @@
 import { Component } from '@angular/core';
+import { ignoreElements } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  title = 'teamapp';
+  newMemberName = '';
+  members: string[] = [];
+  errorMessage = '';
+  numberOfTeams: number | '' = '';
+  teams: string[][] = [];
+
+  onInput(member: string) {
+    this.newMemberName = member;
+  }
+
+  addMember() {
+    if (!this.newMemberName) {
+      this.errorMessage = 'Nothing was entered';
+      return;
+    }
+    this.errorMessage = '';
+    this.members.push(this.newMemberName);
+    this.newMemberName = '';
+  }
+
+  onNumberOfTeamsInput(value: string) {
+    this.numberOfTeams = +value;
+  }
+
+  generateTeams() {
+    if (!this.numberOfTeams || this.numberOfTeams <= 0) {
+      this.errorMessage = 'Incorrect amount of teams';
+      return;
+    }
+
+    if (this.numberOfTeams > this.members.length) {
+      this.errorMessage =
+        'Amount should be equal to or less than number of members';
+      return;
+    }
+
+    this.errorMessage = '';
+
+    const allMembers = [...this.members];
+
+    while (allMembers.length) {
+      for (let i = 0; i < this.numberOfTeams; i++) {
+        const randomIndex = Math.floor(Math.random() * allMembers.length);
+        const member = allMembers.splice(randomIndex, 1)[0];
+
+        if (!member) break;
+
+        if (this.teams[i]) {
+          this.teams[i].push(member);
+        } else {
+          this.teams[i] = [member];
+        }
+      }
+    }
+    this.members = [];
+    this.numberOfTeams = '';
+  }
 }
